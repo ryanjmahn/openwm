@@ -23,15 +23,24 @@ export const SOCIALS = [
 // Pilot form submissions. Swap for a Formspree endpoint or a real API.
 export const PILOT_ENDPOINT = ""; // [PLACEHOLDER: Formspree / API endpoint]
 
-// Who backs us. Logo is Todd's own wordmark (from toddagriscience.com), used as-is.
-export const BACKERS = [
+// Who backs us. Logo is J's own mark (from their LinkedIn company page), used as-is.
+export const BACKERS: {
+  name: string;
+  label?: string; // optional text after the logo
+  logo: string;
+  logoAlt: string;
+  logoWidth: number;
+  logoHeight: number;
+  logoClass: string;
+  href: string;
+}[] = [
   {
-    name: "Todd Founder Program",
-    logo: "/backers/todd-wordmark.svg",
-    logoAlt: "Todd",
-    logoWidth: 76,
-    logoHeight: 25,
-    org: "Todd Agriscience",
-    href: "https://toddagriscience.com/index/announcing-the-todd-founder-program",
+    name: "J",
+    logo: "/backers/j-logo.png",
+    logoAlt: "J",
+    logoWidth: 75,
+    logoHeight: 107,
+    logoClass: "h-[24px]",
+    href: "https://www.linkedin.com/company/j-founders/",
   },
 ];

@@ -23,7 +23,7 @@ export const SOCIALS = [
 // Pilot form submissions. Swap for a Formspree endpoint or a real API.
 export const PILOT_ENDPOINT = ""; // [PLACEHOLDER: Formspree / API endpoint]
 
-// Who backs us. Logo is J's own mark (from their LinkedIn company page), used as-is.
+// Who backs us. Logo is J's own mark (from their LinkedIn company page), used as-is; links to their programme site.
 export const BACKERS: {
   name: string;
   label?: string; // optional text after the logo
@@ -41,6 +41,6 @@ export const BACKERS: {
     logoWidth: 75,
     logoHeight: 107,
     logoClass: "h-[24px]",
-    href: "https://www.linkedin.com/company/j-founders/",
+    href: "https://risingfounder.net/",
   },
 ];

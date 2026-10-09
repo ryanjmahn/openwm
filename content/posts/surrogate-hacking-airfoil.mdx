@@ -1,0 +1,93 @@
+export const meta = {
+  title: "Surrogate Hacking in LLM-Driven Airfoil Design",
+  date: "2026-10-01", // [PLACEHOLDER: confirm publication date]
+  dek: "Optimizers — LLM agents included — learn to exploit a surrogate's blind spots instead of finding better designs. Uncertainty has to gate every prediction.",
+  tags: ["Research", "AI/ML", "Aero"],
+  authors: "[PLACEHOLDER: author list]",
+  venue: "[PLACEHOLDER: venue/status]",
+  featured: true,
+};
+
+<Abstract>
+  Surrogate models make design optimization cheap, but an optimizer only ever sees the surrogate's estimate — never the real performance. Push hard enough and it finds designs that score well *because* the surrogate is wrong about them.
+  We call this **surrogate hacking**, and argue that uncertainty has to gate every prediction an optimizer is allowed to act on.
+</Abstract>
+
+## Why surrogates are everywhere
+
+Fast surrogate models are the reason design optimization is affordable at all. A neural network trained on a few hundred CFD runs can score a new airfoil in milliseconds instead of hours.
+
+Put an optimizer on top of it — a genetic algorithm, a gradient method, or, increasingly, an LLM agent proposing geometries in a loop — and you can search thousands of candidates in an afternoon.
+
+The trouble is what the optimizer is actually optimizing. It never sees the airfoil's real performance; it sees the surrogate's *estimate* of it. Given enough freedom, it will find the places where those two disagree in its favour.
+
+## What surrogate hacking looks like
+
+The optimizer drifts toward designs that score well under the surrogate *because* they sit where the surrogate is wrong — typically far from the data it was trained on. The predicted lift-to-drag ratio climbs; the real one, when you finally run the solver, does not.
+
+Formally, the optimizer solves
+
+$$
+x^\star = \arg\max_{x \in \mathcal{X}} \hat f(x),
+$$
+
+where $\hat f$ is the surrogate and $f$ is the true objective. Writing the surrogate's error as $\varepsilon(x) = \hat f(x) - f(x)$,
+
+$$
+\hat f(x^\star) = f(x^\star) + \varepsilon(x^\star),
+$$
+
+so the arg-max is biased toward points where $\varepsilon$ is large and positive.[^1]
+
+<PullQuote>The harder you optimize, the more of your “improvement” is error.</PullQuote>
+
+<Figure n={1} caption="Optimizing against a surrogate (schematic)">
+  <svg viewBox="0 0 600 260" fill="none" stroke="currentColor" strokeWidth="1" className="w-full text-fg" role="img" aria-label="Schematic: the surrogate's predicted curve rises steeply outside the training data while the true curve falls; the optimizer's chosen point sits in that gap.">
+    <path d="M40 220 H580 M40 220 V20" />
+    <rect x="80" y="20" width="230" height="200" fill="var(--cream)" stroke="none" />
+    <text x="92" y="38" fontSize="10" fontFamily="var(--font-mono)" fill="var(--muted)" stroke="none">TRAINING DATA</text>
+    <path d="M50 190 C120 150, 200 110, 300 100 C380 92, 440 120, 570 170" />
+    <path d="M50 190 C120 150, 200 110, 300 100 C380 80, 460 50, 570 30" strokeDasharray="4 4" />
+    <path d="M300 100 C380 80, 460 50, 570 30 L570 170 C440 120, 380 92, 300 100 Z" fill="var(--blue-soft)" stroke="none" />
+    <circle cx="540" cy="36" r="4" stroke="var(--blue)" />
+    <line x1="540" y1="36" x2="540" y2="158" stroke="var(--blue)" />
+    <text x="520" y="26" textAnchor="end" fontSize="10" fontFamily="var(--font-mono)" fill="currentColor" stroke="none">PREDICTED</text>
+    <text x="530" y="182" textAnchor="end" fontSize="10" fontFamily="var(--font-mono)" fill="currentColor" stroke="none">ACTUAL</text>
+    <text x="580" y="240" textAnchor="end" fontSize="10" fontFamily="var(--font-mono)" fill="var(--muted)" stroke="none">DESIGN SPACE →</text>
+  </svg>
+</Figure>
+
+## Why LLM agents make it worse
+
+It is tempting to think that an LLM agent — with its broad priors about aerodynamics — would be less prone to this than a blind optimizer.
+
+In practice an agent rewarded by a surrogate score is still an optimizer, and a capable one. It is very good at noticing which kinds of edits move the number, and it will keep making them.
+
+<Note>[PLACEHOLDER: summary of the paper's experimental setup and findings — do not publish until filled in from the paper.]</Note>
+
+<Figure n={2} caption="Try it — the same optimizer with the uncertainty gate on and off (illustrative)">
+  <UncertaintyFigure />
+</Figure>
+
+## What we take from it
+
+<Takeaways
+  items={[
+    {
+      title: "A surrogate you can’t trust is worse than none.",
+      body: "A confident wrong answer costs more than no answer, because it stops you from running the test that would have caught it.",
+    },
+    {
+      title: "Uncertainty is not optional metadata.",
+      body: "It has to sit in the loop, gating which predictions are acted on and which are sent to a real solver.",
+    },
+    {
+      title: "Verification should be cheap to trigger.",
+      body: "If routing a design to a real test is a hassle, nobody will do it — so it has to be the default for anything the model is unsure about.",
+    },
+  ]}
+/>
+
+That is the design principle behind OpenWM: predict when you can, say so when you can't, and spend real compute only where it changes the answer.
+
+[^1]: This is a version of Goodhart's law and of the "optimizer's curse" from decision theory: selecting the maximum of noisy estimates systematically overestimates the true value.
